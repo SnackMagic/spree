@@ -32,7 +32,9 @@ module Spree
         add(promotions, promotion, source.promotion_id)
       end
 
-      def promotions_adjustments(promotion_id, adjustments = adjustments)
+      # Fix circular arguments error in ruby 2.7.6 by set 'adjustments = self.adjustments'
+      # The old one was 'adjustments = adjustments'
+      def promotions_adjustments(promotion_id, adjustments = self.adjustments)
         where(sources, promotion_id: promotion_id).map do |source|
           where(adjustments, source_id: source.id)
         end.flatten

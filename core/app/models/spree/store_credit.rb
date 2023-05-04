@@ -12,13 +12,13 @@ module Spree
 
     DEFAULT_CREATED_BY_EMAIL = 'spree@example.com'.freeze
 
-    belongs_to :user, class_name: Spree.user_class.to_s, foreign_key: 'user_id'
+    belongs_to :user, class_name: Spree.user_class.to_s, foreign_key: 'user_id', optional: true
     belongs_to :category, class_name: 'Spree::StoreCreditCategory'
     belongs_to :created_by, class_name: Spree.user_class.to_s, foreign_key: 'created_by_id'
     belongs_to :credit_type, class_name: 'Spree::StoreCreditType', foreign_key: 'type_id'
     has_many :store_credit_events
 
-    validates :user, :category, :credit_type, :created_by, :currency, presence: true
+    validates :category, :credit_type, :created_by, :currency, presence: true
     validates :amount, numericality: { greater_than: 0 }
     validates :amount_used, numericality: { greater_than_or_equal_to: 0 }
     validate :amount_used_less_than_or_equal_to_amount
@@ -217,7 +217,7 @@ module Spree
       event.update_attributes!(
         amount: action_amount || amount,
         authorization_code: action_authorization_code || event.authorization_code || generate_authorization_code,
-        user_total_amount: user.total_available_store_credit,
+        user_total_amount: user&.total_available_store_credit,
         originator: action_originator
       )
     end
